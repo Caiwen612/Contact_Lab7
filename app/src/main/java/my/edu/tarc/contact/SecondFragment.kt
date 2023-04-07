@@ -1,15 +1,20 @@
 package my.edu.tarc.contact
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import my.edu.tarc.contact.databinding.FragmentSecondBinding
+import my.tarc.mycontact.Contact
+import my.tarc.mycontact.ContactViewModel
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
@@ -22,6 +27,14 @@ class SecondFragment : Fragment(), MenuProvider {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    //Refer to the view model created by Main Activity.kt
+    //if which fragment u like to use the view model insert this line
+    private val contactViewModel: ContactViewModel by activityViewModels()
+
+    //ZHI Yi
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -40,6 +53,15 @@ class SecondFragment : Fragment(), MenuProvider {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        //ZHIYI
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
+        // Hide the floating action button
+        val fab: View = requireActivity().findViewById(R.id.fab)
+        fab!!.isVisible = false
+        Log.d("Add Fragment", "onViewCreated")
     }
 
     override fun onDestroyView() {
@@ -54,7 +76,14 @@ class SecondFragment : Fragment(), MenuProvider {
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         if(menuItem.itemId == R.id.action_save){
-
+            with(binding){
+                val name = editTextName.text.toString()
+                val phone = editTextPhone.text.toString()
+                val newContact = Contact(name, phone)
+                contactViewModel.insertContact(newContact)
+                findNavController().navigateUp()
+            }
+            //with
             Toast.makeText(context, getString(R.string.contact_saved), Toast.LENGTH_SHORT).show()
         }else if(menuItem.itemId == android.R.id.home){
             findNavController().navigateUp()

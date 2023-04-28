@@ -35,6 +35,7 @@ class ContactViewModel (application: Application): AndroidViewModel(application)
         contactList = repository.allContacts
     }
 
+
     //Any suspend function must using the launch syntax to call
 
     //Global scope

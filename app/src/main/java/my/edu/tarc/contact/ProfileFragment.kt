@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
@@ -15,6 +16,8 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import my.edu.tarc.contact.databinding.FragmentProfileBinding
 import java.io.File
 import java.io.FileNotFoundException
@@ -46,6 +49,8 @@ class ProfileFragment : Fragment(), MenuProvider {
             binding.editTextProfileName.setText(getString(getString(R.string.name), ""))
             binding.editTextProfilePhone.setText(getString(getString(R.string.phone), ""))
         }
+
+
 
         //Let ProfileFragment to manage the Menu
         val menuHost: MenuHost = this.requireActivity()
@@ -84,8 +89,10 @@ class ProfileFragment : Fragment(), MenuProvider {
                 putString(getString(R.string.phone), phone)
                 apply()
             }
-
+            //Save profile picture to the local storage
             saveProfilePicture(binding.imageViewPicture)
+            //save the picture to cloud storage
+            uploadProfilePicture()
 
             Toast.makeText(context, getString(R.string.profile_saved), Toast.LENGTH_SHORT).show()
         }else if(menuItem.itemId == android.R.id.home){
@@ -126,6 +133,32 @@ class ProfileFragment : Fragment(), MenuProvider {
             }
         }
         return null
+    }
+
+    private fun uploadProfilePicture() {
+        val filename = "profile.png"
+        val file = Uri.fromFile(File(this.context?.filesDir, filename))
+
+        try {
+            val storageRef = Firebase.storage("gs://contact-76b42.appspot.com").reference
+            val userRef = sharedPreferences.getString(getString(R.string.phone),"")
+
+            if(userRef.isNullOrEmpty()){
+                Toast.makeText(context, getString(R.string.profie_error),Toast.LENGTH_SHORT).show()
+            } else {
+                //upload profile picture to cloud storage
+                storageRef.child("profile_pic").child(userRef).putFile(file)
+                Toast.makeText(context, "DONE UPLOAD IN FIREBASE",Toast.LENGTH_SHORT).show()
+                //File path
+                //root
+                // - profile_pic(folder)
+                // - documents
+                //
+            }
+        }catch (e: FileNotFoundException){
+            e.printStackTrace()
+        }
+
     }
 }
 

@@ -1,12 +1,16 @@
 package my.edu.tarc.contact
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import my.edu.tarc.contact.databinding.FragmentFirstBinding
@@ -16,7 +20,7 @@ import my.tarc.mycontact.ContactViewModel
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
-class FirstFragment : Fragment() {
+class FirstFragment : Fragment(), MenuProvider {
 
     private var _binding: FragmentFirstBinding? = null
 
@@ -34,12 +38,20 @@ class FirstFragment : Fragment() {
     ): View? {
 
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
+        //Let First Fragment to manage the Menu
+        val menuHost: MenuHost = this.requireActivity()
+        menuHost.addMenuProvider(this, viewLifecycleOwner,
+            Lifecycle.State.RESUMED)
+
         return binding.root
 
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
+        //Add an observer
 
         //make relationship between adapter and recycle view
         val adapter = ContactAdapter()
@@ -64,5 +76,27 @@ class FirstFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        //Do nothing because we did not have menu to inflate
+    }
+
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        if(menuItem.itemId == R.id.action_upload) {
+            //TODO - Upload records to the Cloud Database
+            //Trust local or remote? or based on version
+            val sharedPreferences: SharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE)
+            val id = sharedPreferences.getString(getString(R.string.phone),"")
+
+            if(id.isNullOrEmpty()){
+                Toast.makeText(context,getString(R.string.profie_error), Toast.LENGTH_SHORT).show()
+            } else{
+                contactViewModel.uploadContact(id)
+                Toast.makeText(context,getString(R.string.contact_uploaded), Toast.LENGTH_SHORT).show()
+            }
+
+        }
+        return true
     }
 }

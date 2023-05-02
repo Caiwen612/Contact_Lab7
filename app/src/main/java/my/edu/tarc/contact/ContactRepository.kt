@@ -2,6 +2,8 @@ package my.tarc.mycontact
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 //A class to determine data source
 
@@ -29,5 +31,17 @@ class ContactRepository(private val contactDao: ContactDao){
     @WorkerThread
     suspend fun delete(contact: Contact){
         contactDao.delete(contact)
+    }
+
+    fun uploadContact(id: String){
+        if(allContacts.isInitialized){
+            if(!allContacts.value.isNullOrEmpty()){
+                val database = Firebase.database("https://contact-76b42-default-rtdb.asia-southeast1.firebasedatabase.app/").reference
+                allContacts.value!!.forEach{
+                    database.child("user").child(id).child(it.phone).setValue(it)
+                }
+            }
+        }
+
     }
 }

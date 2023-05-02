@@ -57,4 +57,8 @@ class ContactViewModel (application: Application): AndroidViewModel(application)
     fun deleteContact(contact: Contact) = viewModelScope.launch {
         repository.delete(contact)
     }
+
+    fun uploadContact(id: String){
+        repository.uploadContact(id)
+    }
 }

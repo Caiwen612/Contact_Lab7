@@ -76,8 +76,9 @@ class ProfileFragment : Fragment(), MenuProvider {
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        menu.clear()
         menuInflater.inflate(R.menu.second_menu, menu)
-        menu.findItem(R.id.action_settings).isVisible = false
+        //menu.findItem(R.id.action_settings).isVisible = false
     }
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -96,6 +97,7 @@ class ProfileFragment : Fragment(), MenuProvider {
 
             Toast.makeText(context, getString(R.string.profile_saved), Toast.LENGTH_SHORT).show()
         }else if(menuItem.itemId == android.R.id.home){
+            //Back button
             findNavController().navigateUp()
         }
         return true

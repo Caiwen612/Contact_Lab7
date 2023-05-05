@@ -16,11 +16,12 @@ import androidx.navigation.fragment.findNavController
 import my.edu.tarc.contact.databinding.FragmentFirstBinding
 import my.tarc.mycontact.ContactAdapter
 import my.tarc.mycontact.ContactViewModel
+import my.tarc.mycontact.RecordClickListener
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
-class FirstFragment : Fragment(), MenuProvider {
+class FirstFragment : Fragment(), MenuProvider, RecordClickListener {
 
     private var _binding: FragmentFirstBinding? = null
 
@@ -54,18 +55,19 @@ class FirstFragment : Fragment(), MenuProvider {
         //Add an observer
 
         //make relationship between adapter and recycle view
-        val adapter = ContactAdapter()
+        val adapter = ContactAdapter(this)
         //insert data to the adapter
         contactViewModel.contactList.observe(
             viewLifecycleOwner,
             Observer {list -> //the list -> default is it, now we change it to the list
                 //if the data contactlist had any change, this observer function wil be run
                 if(list.isEmpty()){
+                    binding.textViewCount.isVisible = true
                     binding.textViewCount.text = getString(R.string.no_record)
                 } else{
                     binding.textViewCount.isVisible = false
-                    adapter.setContact(list)
                 }
+                adapter.setContact(list)
             }
         )
 
@@ -98,5 +100,11 @@ class FirstFragment : Fragment(), MenuProvider {
 
         }
         return true
+    }
+
+    override fun onRecordClickListener(index: Int) {
+        contactViewModel.selectedIndex = index
+        findNavController().navigate(R.id.nav_second)
+
     }
 }

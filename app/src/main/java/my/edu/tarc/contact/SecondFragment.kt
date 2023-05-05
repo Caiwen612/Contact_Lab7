@@ -1,5 +1,6 @@
 package my.edu.tarc.contact
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -54,6 +55,21 @@ class SecondFragment : Fragment(), MenuProvider {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        //Determine the mode of the fragment; Add or Edit
+        if(contactViewModel.selectedIndex != -1){ //Edit Mode
+            if(contactViewModel.contactList.isInitialized){
+                val contact: Contact = contactViewModel.contactList.value!!.get(contactViewModel.selectedIndex)
+
+                with(binding){
+                    editTextName.setText(contact.name)
+                    editTextPhone.setText(contact.phone)
+                    editTextName.requestFocus()
+                    editTextPhone.isEnabled = false
+                }
+            }
+        }
+
+        //Extra: below all did no ocur in sir slide
         //ZHIYI
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
@@ -67,25 +83,60 @@ class SecondFragment : Fragment(), MenuProvider {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        contactViewModel.selectedIndex = -1
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         menuInflater.inflate(R.menu.second_menu, menu)
         menu.findItem(R.id.action_settings).isVisible = false
+        if(contactViewModel.selectedIndex == -1){//Add
+            menu.findItem(R.id.action_delete).isVisible = false
+        }
+
     }
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         if(menuItem.itemId == R.id.action_save){
-            with(binding){
+            binding.apply{
                 val name = editTextName.text.toString()
                 val phone = editTextPhone.text.toString()
                 val newContact = Contact(name, phone)
-                contactViewModel.insertContact(newContact)
-                findNavController().navigateUp()
+                if(contactViewModel.selectedIndex == -1){//Add mode
+                    contactViewModel.insertContact(newContact)
+                } else{//Edit mode
+                    contactViewModel.updateContact(newContact)
+                    ///TODO UPDATE Record
+                }
+
+//                findNavController().navigateUp()
             }
             //with
             Toast.makeText(context, getString(R.string.contact_saved), Toast.LENGTH_SHORT).show()
-        }else if(menuItem.itemId == android.R.id.home){
+        }
+        else if(menuItem.itemId == R.id.action_delete){
+            //You can also use the with to do?
+            val deleteAlertDialog = AlertDialog.Builder(requireActivity())
+            deleteAlertDialog.setMessage(R.string.delete_record)
+            deleteAlertDialog.setPositiveButton(
+                getString(R.string.delete),
+                {_,_ -> //dialog,id
+                    //Method had should have 2 parameter, we are not using , so replace _
+                    val contact = Contact(binding.editTextName.text.toString(),
+                    binding.editTextPhone.text.toString())
+                    contactViewModel.deleteContact(contact)
+                    findNavController().navigateUp()
+                }
+            )
+            deleteAlertDialog.setNegativeButton(
+                getString(android.R.string.cancel),
+                {
+                    _,_ ->
+                    //Do nothing here
+                }
+            )
+            deleteAlertDialog.create().show()
+        }
+        else if(menuItem.itemId == android.R.id.home){
             findNavController().navigateUp()
         }
         return true

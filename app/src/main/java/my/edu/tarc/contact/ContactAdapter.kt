@@ -12,7 +12,7 @@ import my.edu.tarc.contact.R
 //Holds data for a recycle view
 
 //posibble 1 adapter can handle more than 1 recycle view
-class ContactAdapter : RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
+class ContactAdapter(private val recordClickListener: RecordClickListener) : RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
     //Cached copy of contacts
     private var contactList = emptyList<Contact>() //Temporary hold a list of data
 
@@ -46,7 +46,9 @@ class ContactAdapter : RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
         holder.textViewContact.text = contactList[position].phone
         holder.itemView.setOnClickListener {
             //Item click event handler
-            Toast.makeText(it.context, "Contact name:" + contactList[position].name, Toast.LENGTH_SHORT).show()
+            //Toast.makeText(it.context, "Contact name:" + contactList[position].name, Toast.LENGTH_SHORT).show()
+
+            recordClickListener.onRecordClickListener(position)
         }
     }
 
@@ -54,4 +56,8 @@ class ContactAdapter : RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
         return contactList.size
     }
 
+}
+
+interface RecordClickListener{
+    fun onRecordClickListener(index: Int)
 }

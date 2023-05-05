@@ -15,4 +15,7 @@
     <string name="profie_error">Error uploading profile picture</string>
     <string name="upload">Upload</string>
     <string name="contact_uploaded">Upload contact into firebase</string>
+    <string name="delete">delete</string>
+    <string name="delete_record">Delete Record?</string>
+    <string name="edit">edit</string>
 </resources>

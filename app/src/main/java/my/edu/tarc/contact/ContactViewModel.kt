@@ -19,6 +19,8 @@ class ContactViewModel (application: Application): AndroidViewModel(application)
     //LiveData gives us updated contacts when they change
     var contactList : LiveData<List<Contact>> = _contactList
 
+    var selectedIndex: Int = -1
+
     private val repository: ContactRepository
 
     //connect repository to viewmodel
@@ -50,10 +52,12 @@ class ContactViewModel (application: Application): AndroidViewModel(application)
          repository.insert(contact)
     }
 
+    //Update Contact
     fun updateContact(contact: Contact) = viewModelScope.launch {
         repository.update(contact)
     }
 
+    //Delete contact
     fun deleteContact(contact: Contact) = viewModelScope.launch {
         repository.delete(contact)
     }

@@ -14,4 +14,9 @@
         android:icon="@drawable/ic_baseline_cloud_upload_24"
         app:showAsAction="ifRoom"
         />
+    <item
+        android:id="@+id/action_download"
+        android:icon="@drawable/ic_baseline_cloud_download_24"
+        android:title="@string/download"
+        app:showAsAction="ifRoom" />
 </menu>

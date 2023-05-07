@@ -33,6 +33,11 @@ class ContactRepository(private val contactDao: ContactDao){
         contactDao.delete(contact)
     }
 
+    @WorkerThread
+    suspend fun deleteAll(){
+        contactDao.deleteAll()
+    }
+
     fun uploadContact(id: String){
         if(allContacts.isInitialized){
             if(!allContacts.value.isNullOrEmpty()){
@@ -44,4 +49,6 @@ class ContactRepository(private val contactDao: ContactDao){
         }
 
     }
+
+
 }
